@@ -5,11 +5,13 @@ const cors = require('cors')
 
 const server = express()
 
-mongoose.connect('mongodb+srv://wwe:wwe@cluster0-kdsyf.mongodb.net/oministack8?retryWrites=true&w=majority', {
+const url = 'mongodb+srv://wwe:wwe@cluster0-kdsyf.mongodb.net/oministack81?retryWrites=true&w=majority'
+
+mongoose.connect(url, {
     useNewUrlParser: true
 })
 
-server.use(cors)
+server.use(cors())
 server.use(express.json())
 server.use(routes)
 
