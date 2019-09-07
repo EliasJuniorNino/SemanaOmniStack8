@@ -1,4 +1,4 @@
-import { createAppContainer, createSwitchNavigator } from 'react-native'
+import { createAppContainer, createSwitchNavigator } from 'react-navigation'
 
 import Login from './pages/Login'
 import Main from './pages/Main'
