@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
+import io from 'socket.io-client'
 import { 
   View, SafeAreaView, StyleSheet, Image, TouchableOpacity, Text
 } from 'react-native';
@@ -13,6 +14,7 @@ import dislike from '../assets/dislike.png';
 export default function Main({ navigation }){  
   const id = navigation.getParam('user')
   const [ users, setUsers ] = useState([])
+  const [ matchDev, setMatchDev ] = useState(null)
 
   useEffect( () => {
     async function loadUsers(){
@@ -24,6 +26,16 @@ export default function Main({ navigation }){
       setUsers(response.data)
     }
     loadUsers()
+  }, [ id ])
+
+  useEffect(() => {
+    const socket = io('http://localhost:3333', {
+        query: { user: id }
+    })
+
+    socket.on('match', dev => {
+        setMatchDev(dev)
+    })
   }, [ id ])
   
   async function handleDislike(){
@@ -87,6 +99,19 @@ export default function Main({ navigation }){
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={handleLike}>
               <Image source={like} />
+            </TouchableOpacity>
+          </View>
+        )
+      }
+      {
+        matchDev && (
+          <View style={ styles.matchContainer}>
+            <Text style={styles.isamatch}>It's a match</Text>
+            <Image style={styles.matchAvatar} source={{ uri: matchDev.avatar }}/>
+            <Text style={styles.matchName}>{ matchDev.name }</Text>
+            <Text style={styles.matchBio}>{ matchDev.bio }</Text>
+            <TouchableOpacity onPress={() => setMatchDev(null)}>
+              <Text style={styles.closeMatch}>FECHAR</Text>
             </TouchableOpacity>
           </View>
         )
@@ -169,5 +194,52 @@ const styles = StyleSheet.create({
     color: '#999',
     fontSize: 24,
     fontWeight: 'bold',
+  },
+
+  matchContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 99
+  },
+
+  isamatch: {
+    fontWeight: 'bold',
+    fontSize: 32,
+    color: '#FFF'
+  },
+
+  matchAvatar: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    borderWidth: 5,
+    borderColor: '#FFF',
+    marginVertical: 30
+  },
+
+  matchName: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#FFF'
+  },
+
+  matchBio: {
+    marginTop: 10,
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: 24,
+    textAlign: 'center',
+    paddingHorizontal: 30
+  },
+
+  closeMatch: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    marginTop: 30,
+    fontWeight: 'bold'
   }
+
 })
